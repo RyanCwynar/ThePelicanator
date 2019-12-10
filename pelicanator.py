@@ -35,23 +35,31 @@ else:
 reset_detections_threshold = time.time() + 20
 # we will trigger the pump after a certain number of detections
 detections = 0
+# if we just pelicanated, backoff for like 30 seconds 
+backoff = 0
 def detectBird(classes):
     global reset_detections_threshold
     global detections
+    global backoff
     label_list = []
     for i in range(len(classes)):
         label_list.append(labels[int(classes[i])])
     if("bird" in label_list):
-        detections = detections + 1
-        print("detection {} / 5".format(detections))
         if (time.time() > reset_detections_threshold):
             print("reset timer")
             reset_detections_threshold = time.time() + 20
             detections = 0
-        if (detections > 4):
+        if (time.time() < backoff):
+            t = backoff - time.time()
+            print("Backoff enabled, restart detections in {}s".format(t))
+        else:
+            detections = detections + 1
+            print("detection {} / 5".format(detections))
+        if (detections > 4 and time.time() > backoff ):
             print("pelicanate")
             runPump()
             detections = 0
+            backoff = time.time() + 30
 
 # Define VideoStream class to handle streaming of video from webcam in separate processing thread
 # Source - Adrian Rosebrock, PyImageSearch: https://www.pyimagesearch.com/2015/12/28/increasing-raspberry-pi-fps-with-python-and-opencv/

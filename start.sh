@@ -1,1 +1,1 @@
-python3 pelicanator.py --modeldir=coco
+python3 p/pelicanator.py --modeldir=p/coco
