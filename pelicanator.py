@@ -30,6 +30,28 @@ if pkg is None:
     from tflite_runtime.interpreter import Interpreter
 else:
     from tensorflow.lite.python.interpreter import Interpreter
+    
+# want to make sure that detection threshold is hit quickly, not randomly
+reset_detections_threshold = time.time() + 20
+# we will trigger the pump after a certain number of detections
+detections = 0
+def detectBird(classes):
+    global reset_detections_threshold
+    global detections
+    label_list = []
+    for i in range(len(classes)):
+        label_list.append(labels[int(classes[i])])
+    if("bird" in label_list):
+        detections = detections + 1
+        print("detection {} / 5".format(detections))
+        if (time.time() > reset_detections_threshold):
+            print("reset timer")
+            reset_detections_threshold = time.time() + 20
+            detections = 0
+        if (detections > 4):
+            print("pelicanate")
+            runPump()
+            detections = 0
 
 # Define VideoStream class to handle streaming of video from webcam in separate processing thread
 # Source - Adrian Rosebrock, PyImageSearch: https://www.pyimagesearch.com/2015/12/28/increasing-raspberry-pi-fps-with-python-and-opencv/
@@ -73,24 +95,7 @@ class VideoStream:
     # Indicate that the camera and thread should be stopped
         self.stopped = True
 
-# want to make sure that detection threshold is hit quickly, not randomly
-reset_detections_threshold = time.time() + 20
-# we will trigger the pump after a certain number of detections
-detections = 0
-def detectBird(classes):
-    global reset_detections_threshold
-    global detections
-    label_list = []
-    for i in range(len(classes)):
-        label_list.append(labels[int(classes[i])])
-    if("bird" in label_list):
-        detections = detections + 1
-        if (time.time() > reset_detections_threshold):
-            reset_detections_threshold = time.time() + 20
-            detections = 0
-        if (detections > 5):
-            print("bird detected, spray water")
-            runPump()
+
 
 # Define and parse input arguments
 parser = argparse.ArgumentParser()
