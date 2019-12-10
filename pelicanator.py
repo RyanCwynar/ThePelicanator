@@ -72,15 +72,25 @@ class VideoStream:
     def stop(self):
     # Indicate that the camera and thread should be stopped
         self.stopped = True
-        
-        
+
+# want to make sure that detection threshold is hit quickly, not randomly
+reset_detections_threshold = time.time() + 20
+# we will trigger the pump after a certain number of detections
+detections = 0
 def detectBird(classes):
+    global reset_detections_threshold
+    global detections
     label_list = []
     for i in range(len(classes)):
         label_list.append(labels[int(classes[i])])
     if("bird" in label_list):
-        print("bird detected, spray water")
-        runPump()
+        detections = detections + 1
+        if (time.time() > reset_detections_threshold):
+            reset_detections_threshold = time.time() + 20
+            detections = 0
+        if (detections > 5):
+            print("bird detected, spray water")
+            runPump()
 
 # Define and parse input arguments
 parser = argparse.ArgumentParser()
@@ -180,7 +190,8 @@ while True:
     cv2.putText(frame,'FPS: {0:.2f}'.format(frame_rate_calc),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,0),2,cv2.LINE_AA)
 
     # All the results have been drawn on the frame, so it's time to display it.
-    cv2.imshow('Object detector', frame)
+    # Hide next line if you want to run headless
+    # cv2.imshow('Object detector', frame)
 
     # Calculate framerate
     t2 = cv2.getTickCount()
