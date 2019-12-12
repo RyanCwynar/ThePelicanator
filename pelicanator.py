@@ -57,6 +57,8 @@ def detectBird(classes):
             print("detection {} / 5".format(detections))
         if (detections > 4 and time.time() > backoff ):
             print("pelicanate")
+            
+           
             runPump()
             detections = 0
             backoff = time.time() + 30

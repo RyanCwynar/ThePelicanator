@@ -1,5 +1,8 @@
 #!/bin/bash
 
+sudo apt-get upgrade
+sudo apt-get dist-upgrade
+
 # Get packages required for OpenCV
 
 sudo apt-get -y install libjpeg-dev libtiff5-dev libjasper-dev libpng12-dev
@@ -15,7 +18,8 @@ pip3 install opencv-python==3.4.6.27
 # Thanks lhelontra for being super awesome!
 # Will change to just 'pip3 install tensorflow' once newer versions of TF are added to piwheels
 
-#pip3 install tensorflow
+pip3 install tensorflow
+pip3 install rpimotorlib
 
 version=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')
 
